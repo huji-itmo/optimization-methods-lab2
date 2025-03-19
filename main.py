@@ -27,3 +27,9 @@ if __name__ == "__main__":
     optimizer.newton(
         epsilon=epsilon, x0=1, df=func_derivative, d2f=func_second_derivative
     )
+    optimizer.square_approx(
+        (func_range[0] + func_range[1]) / 2, (func_range[0] + func_range[1]) / 4
+    )
+
+
+# пук пук среньк пук пук среньк пук пук среньк скибиди доп доп доп ес ес скибиди дабл ю дип дип скибиди доп доп доп ес ес скибиди скибиди скибиди скибиди

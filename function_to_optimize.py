@@ -206,3 +206,27 @@ class FunctionToOptimize:
         if self.debug:
             print(f"\nReached max iterations ({max_iter})")
         return x, max_iter
+
+    # sAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAЗОЧУ ЕСТЬ ФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФФААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААААК
+    def square_approx(self, initial_x_0, h):
+        print(f"\n=== square approximation, x_0={initial_x_0}, h={h} ===")
+        f = self.func
+        f_0 = f(initial_x_0)
+        f_0_plus_h = f(initial_x_0 + h)
+
+        x_1, x_2, x_3 = 0, 0, 0
+        if f_0 < f_0_plus_h:
+            x_1 = initial_x_0 - h
+            x_2 = initial_x_0
+            x_3 = initial_x_0 + h
+        else:
+            x_1 = initial_x_0 - 2 * h
+            x_2 = initial_x_0
+            x_3 = initial_x_0 + 2 * h
+
+        x_min = (x_1 + x_2) * 0.5 + 0.5 * (x_3 - x_1) * (x_3 - x_2) * (
+            f(x_2) - f(x_1)
+        ) / (f(x_1) * (x_2 - x_3) + f(x_2) * (x_3 - x_1) + f(x_3) * (x_1 - x_2))
+        print(f"\nresult: {x_min}")
+
+        return x_min
