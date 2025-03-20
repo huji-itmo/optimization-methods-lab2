@@ -37,6 +37,15 @@ class FunctionToOptimize:
             print(f"Start range: {self.optimization_range}")
 
         left, right = self.optimization_range
+        df = self._numerical_derivative
+        df_left = df(left)
+        df_right = df(right)
+
+        if df_left * df_right >= 0:
+            if self.debug:
+                print("Error: Derivative does not change sign")
+            raise ValueError("Производная не меняет знак на интервале")
+
         phi = (1 + 5**0.5) / 2
 
         c = right - (right - left) / phi
@@ -202,6 +211,14 @@ class FunctionToOptimize:
         x = x0 if x0 else (left + right) / 2
         df = df or self._numerical_derivative
         d2f = d2f or self._numerical_second_derivative
+
+        df_left = df(left)
+        df_right = df(right)
+
+        if df_left * df_right >= 0:
+            if self.debug:
+                print("Error: Derivative does not change sign")
+            raise ValueError("Производная не меняет знак на интервале")
 
         for it in range(max_iter):
             dx = df(x)
