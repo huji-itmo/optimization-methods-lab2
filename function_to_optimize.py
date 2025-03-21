@@ -37,15 +37,6 @@ class FunctionToOptimize:
             print(f"Start range: {self.optimization_range}")
 
         left, right = self.optimization_range
-        df = self._numerical_derivative
-        df_left = df(left)
-        df_right = df(right)
-
-        if df_left * df_right >= 0:
-            if self.debug:
-                print("Error: Derivative does not change sign")
-            raise ValueError("Производная не меняет знак на интервале")
-
         phi = (1 + 5**0.5) / 2
 
         c = right - (right - left) / phi
@@ -83,59 +74,59 @@ class FunctionToOptimize:
         self,
         epsilon: float = 1e-6,
         max_iter: int = 100,
-        df: Optional[Callable[[float], float]] = None,
     ) -> Tuple[float, int]:
         if self.debug:
             print(f"\n=== Bisection (ε={epsilon}, max_iter={max_iter}) ===")
             print(f"Start range: {self.optimization_range}")
 
         left, right = self.optimization_range
-        df = df or self._numerical_derivative
-
-        df_left = df(left)
-        df_right = df(right)
-
-        if self.debug:
-            print(f"Initial df(left): {df_left:.6f}, df(right): {df_right:.6f}")
-
-        if df_left * df_right >= 0:
-            if self.debug:
-                print("Error: Derivative does not change sign")
-            raise ValueError("Производная не меняет знак на интервале")
 
         for it in range(max_iter):
-            mid = (left + right) / 2
-            df_mid = df(mid)
+            x1 = (left + right - epsilon) / 2
+            x2 = (left + right + epsilon) / 2
+
+            y1 = self.func(x1)
+            y2 = self.func(x2)
 
             if self.debug:
                 print(f"\nIteration {it}:")
-                print(f"  Left: {left:.6f} (df={df_left:.6f})")
-                print(f"  Right: {right:.6f} (df={df_right:.6f})")
-                print(f"  Mid: {mid:.6f} (df={df_mid:.6f})")
+                print(f"  x1: {x1:.6f}, y1: {y1:.6f}")
+                print(f"  x2: {x2:.6f}, y2: {y2:.6f}")
+                print(f"  Current interval before update: [{left:.6f}, {right:.6f}]")
                 self.bisection_data.append(
                     {
                         "left": left,
-                        "df_left": df_left,
                         "right": right,
-                        "df_right": df_right,
-                        "mid": mid,
-                        "df_mid": df_mid,
+                        "x1": x1,
+                        "y1": y1,
+                        "x2": x2,
+                        "y2": y2,
                     }
                 )
 
-            if abs(df_mid) < epsilon:
+            # Обновляем границы интервала
+            if y1 > y2:
+                left = x1
+            else:
+                right = x2
+
+            if self.debug:
+                print(f"  Updated interval: [{left:.6f}, {right:.6f}]")
+
+            # Проверка условия остановки после обновления границ
+            if (right - left) <= 2 * epsilon:
+                xm = (left + right) / 2
                 if self.debug:
                     print(f"\nConverged after {it+1} iterations")
-                return mid, it + 1
+                    print(f"Final interval: [{left:.6f}, {right:.6f}], xm: {xm:.6f}")
+                return xm, it + 1
 
-            if df_left * df_mid < 0:
-                right, df_right = mid, df_mid
-            else:
-                left, df_left = mid, df_mid
-
+        # Достигнуто максимальное количество итераций
+        xm = (left + right) / 2
         if self.debug:
             print(f"\nReached max iterations ({max_iter})")
-        return (left + right) / 2, max_iter
+            print(f"Final interval: [{left:.6f}, {right:.6f}], xm: {xm:.6f}")
+        return xm, max_iter
 
     def chord(
         self,
@@ -329,21 +320,39 @@ class FunctionToOptimize:
             print("Run bisection with debug=True first.")
             return
 
-        x = np.linspace(*self.optimization_range, 1000)
-        dy = [self._numerical_derivative(xi) for xi in x]
+        left, right = self.optimization_range
+        x = np.linspace(left, right, 1000)
+        y = [self.func(xi) for xi in x]
 
         plt.figure(figsize=(10, 6))
-        plt.plot(x, dy, label="Derivative")
-        plt.axhline(0, color="black", linestyle="--")
-        for d in self.bisection_data:
+        plt.plot(x, y, label="Function")
+        for i, d in enumerate(self.bisection_data):
             plt.axvspan(d["left"], d["right"], alpha=0.1, color="blue")
-            plt.scatter(d["mid"], d["df_mid"], color="red", s=20)
+            plt.scatter([d["x1"], d["x2"]], [d["y1"], d["y2"]], color="red", s=20)
+        final_x = (
+            self.bisection_data[-1]["left"] + self.bisection_data[-1]["right"]
+        ) / 2
+        plt.scatter(
+            final_x,
+            self.func(final_x),
+            color="green",
+            marker="*",
+            s=100,
+            label="Result",
+        )
+
+        # Plot the final result
         final_x = (
             self.bisection_data[-1]["left"] + self.bisection_data[-1]["right"]
         ) / 2
         plt.scatter(final_x, 0, color="green", marker="*", s=100, label="Result")
-        plt.title("Bisection Method")
+
+        # Add labels, legend, and save the plot
+        plt.title("Bisection Method Visualization")
+        plt.xlabel("x")
+        plt.ylabel("Derivative Value")
         plt.legend()
+        plt.grid(True)
         plt.savefig(self.plot_path + "bisection.pdf")
         plt.savefig(self.plot_path + "bisection.png")
         plt.close()
@@ -413,36 +422,108 @@ class FunctionToOptimize:
 
         plt.close()
 
-    def plot_newton(self):
-        if not self.newton_data:
-            print("Run newton method with debug=True first.")
-            return
+    import matplotlib.pyplot as plt
 
-        x = np.linspace(*self.optimization_range, 1000)
-        y = [self.func(xi) for xi in x]
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(x, y, label="Function")
-        for d in self.newton_data:
-            plt.scatter(d["x"], self.func(d["x"]), color="red", s=20)
-            plt.plot(
-                [d["x"], d["x_new"]],
-                [self.func(d["x"]), self.func(d["x_new"])],
-                "--",
-                color="blue",
-                alpha=0.5,
+    def plot_newton(self) -> None:
+        if not hasattr(self, "newton_data") or len(self.newton_data) == 0:
+            raise ValueError(
+                "No Newton iteration data found. Run newton() with debug=True first."
             )
+
+        left, right = self.optimization_range
+        x = np.linspace(left, right, 400)
+
+        # Determine if we can plot the original function
+        has_original_function = hasattr(self, "f") and callable(self.f)
+
+        # Create figure and subplots
+        if has_original_function:
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+        else:
+            fig, ax2 = plt.subplots(1, 1, figsize=(12, 4))
+            ax1 = None  # Placeholder for logic below
+
+        # Plot original function if available
+        if has_original_function:
+            try:
+                f_values = [self.f(xi) for xi in x]
+                ax1.plot(x, f_values, label="$f(x)$", color="blue", linewidth=2)
+                final_x = self.newton_data[-1]["x_new"]
+                ax1.scatter(
+                    final_x,
+                    self.f(final_x),
+                    color="red",
+                    s=100,
+                    zorder=5,
+                    label="Optimal $x$",
+                )
+                ax1.set_title("Original Function $f(x)$ and Optimal Point", pad=20)
+                ax1.legend(loc="upper right")
+                ax1.grid(True, linestyle="--", alpha=0.7)
+            except Exception as e:
+                print(f"Warning: Failed to plot original function: {str(e)}")
+                has_original_function = False
+
+        # Plot derivative function
+        df = getattr(self, "df", self._numerical_derivative)
+        df_values = [df(xi) for xi in x]
+
+        # Create second axis if needed
+        if not has_original_function:
+            ax2 = plt.gca()
+
+        ax2.plot(x, df_values, label="$f'(x)$", color="green", linewidth=2)
+        ax2.axhline(0, color="black", linewidth=0.8, linestyle="--", alpha=0.8)
+        ax2.set_title("Newton Iterations on Derivative $f'(x)$", pad=20)
+        ax2.legend(loc="upper right")
+        ax2.grid(True, linestyle="--", alpha=0.7)
+
+        # Plot iteration steps
+        for data in self.newton_data:
+            x_curr = data["x"]
+            dx = data["dx"]
+            x_next = data["x_new"]
+
+            # Current point on derivative curve
+            ax2.scatter(x_curr, dx, color="blue", s=50, zorder=5, label="Current $x$")
+
+            # Tangent line approximation
+            tangent_x = np.array(
+                [x_curr - 0.5, x_curr + 0.5]
+            )  # Local region around x_curr
+            tangent_y = dx + self._numerical_second_derivative(x_curr) * (
+                tangent_x - x_curr
+            )
+            ax2.plot(
+                tangent_x, tangent_y, "r--", alpha=0.7, linewidth=1.5, label="Tangent"
+            )
+
+            # Next approximation on x-axis
+            ax2.scatter(
+                x_next, 0, color="green", s=50, zorder=5, alpha=0.8, label="Next $x$"
+            )
+
+        # Final root marker
         final_x = self.newton_data[-1]["x_new"]
-        plt.scatter(
+        ax2.scatter(
             final_x,
-            self.func(final_x),
-            color="green",
-            marker="*",
+            0,
+            color="red",
             s=100,
-            label="Result",
+            zorder=10,
+            label="Root $x^*$",
+            edgecolor="black",
         )
-        plt.title("Newton's Method")
-        plt.legend()
+
+        # Add legend with unique entries
+        handles, labels = ax2.get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        ax2.legend(by_label.values(), by_label.keys(), loc="upper right")
+
+        # Adjust layout
+        plt.tight_layout()
+        plt.subplots_adjust(hspace=0.3 if has_original_function else 0.1)
+
         plt.savefig(self.plot_path + "newton.pdf")
         plt.savefig(self.plot_path + "newton.png")
         plt.close()

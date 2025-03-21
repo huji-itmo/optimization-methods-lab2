@@ -21,9 +21,15 @@ epsilon: float = 0.05
 if __name__ == "__main__":
     optimizer = FunctionToOptimize(func, func_range, True)
     optimizer.plot_path = "output/"
+    df_left, df_right = func_derivative(func_range[0]), func_derivative(func_range[1])
+
+    if df_left * df_right >= 0:
+        if optimizer.debug:
+            print("Error: Derivative does not change sign")
+        raise ValueError("Производная не меняет знак на интервале")
 
     try:
-        optimizer.bisection(epsilon=epsilon, df=func_derivative)
+        optimizer.bisection(epsilon=epsilon)
         optimizer.plot_bisection()
     except ValueError as e:
         print(e)
@@ -59,6 +65,3 @@ if __name__ == "__main__":
 
     except ValueError as e:
         print(e)
-
-
-# пук пук среньк пук пук среньк пук пук среньк скибиди доп доп доп ес ес скибиди дабл ю дип дип скибиди доп доп доп ес ес скибиди скибиди скибиди скибиди
