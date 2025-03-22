@@ -2,4 +2,4 @@
 ![alt text](https://github.com/huji-itmo/optimization-methods-lab2/blob/main/output/chord.png?raw=true)
 ![alt text](https://github.com/huji-itmo/optimization-methods-lab2/blob/main/output/golden_section.png?raw=true)
 ![alt text](https://github.com/huji-itmo/optimization-methods-lab2/blob/main/output/newton.png?raw=true)
-![alt text](https://github.com/huji-itmo/optimization-methods-lab2/blob/main/output/square_approx.png?raw=true)
+![alt text](https://github.com/huji-itmo/optimization-methods-lab2/blob/main/output/square_approx_iterations.png?raw=true)

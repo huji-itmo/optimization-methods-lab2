@@ -1,5 +1,13 @@
+import math
 from typing import Tuple
 from function_to_optimize import FunctionToOptimize
+from plotter import (
+    plot_bisection,
+    plot_chord,
+    plot_golden_section,
+    plot_newton,
+    plot_square_approx,
+)
 
 
 def func(x: float) -> float:
@@ -30,20 +38,20 @@ if __name__ == "__main__":
 
     try:
         optimizer.bisection(epsilon=epsilon)
-        optimizer.plot_bisection()
+        plot_bisection(optimizer)
     except ValueError as e:
         print(e)
     try:
 
         optimizer.chord(epsilon=epsilon, df=func_derivative)
-        optimizer.plot_chord()
+        plot_chord(optimizer)
 
     except ValueError as e:
         print(e)
     try:
 
         optimizer.golden_section(epsilon=epsilon)
-        optimizer.plot_golden_section()
+        plot_golden_section(optimizer)
 
     except ValueError as e:
         print(e)
@@ -52,16 +60,18 @@ if __name__ == "__main__":
         optimizer.newton(
             epsilon=epsilon, x0=1, df=func_derivative, d2f=func_second_derivative
         )
-        optimizer.plot_newton()
+        plot_newton(optimizer)
 
     except ValueError as e:
         print(e)
     try:
 
         optimizer.square_approx(
-            (func_range[0] + func_range[1]) / 2, (func_range[0] + func_range[1]) / 4
+            (func_range[0] + func_range[1]) / 2,
+            (func_range[0] + func_range[1]) / 4,
+            epsilon=epsilon,
         )
-        optimizer.plot_square_approx()
+        plot_square_approx(optimizer)
 
     except ValueError as e:
         print(e)
