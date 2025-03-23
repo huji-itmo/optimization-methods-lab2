@@ -1,0 +1,143 @@
+
+=== Bisection (ε=0.05, max_iter=100) ===
+Start range: (0, 2)
+
+Iteration 0:
+  x1: 0.975000, y1: 5.376547
+  x2: 1.025000, y2: 5.126578
+  Current interval before update: [0.000000, 2.000000]
+  Updated interval: [0.975000, 2.000000]
+
+Iteration 1:
+  x1: 1.462500, y1: 3.582636
+  x2: 1.512500, y2: 3.495999
+  Current interval before update: [0.975000, 2.000000]
+  Updated interval: [1.462500, 2.000000]
+
+Iteration 2:
+  x1: 1.706250, y1: 3.380190
+  x2: 1.756250, y2: 3.412817
+  Current interval before update: [1.462500, 2.000000]
+  Updated interval: [1.462500, 1.756250]
+
+Iteration 3:
+  x1: 1.584375, y1: 3.410576
+  x2: 1.634375, y2: 3.379984
+  Current interval before update: [1.462500, 1.756250]
+  Updated interval: [1.584375, 1.756250]
+
+Iteration 4:
+  x1: 1.645313, y1: 3.376588
+  x2: 1.695312, y2: 3.376675
+  Current interval before update: [1.584375, 1.756250]
+  Updated interval: [1.584375, 1.695312]
+
+Iteration 5:
+  x1: 1.614844, y1: 3.389022
+  x2: 1.664844, y2: 3.373541
+  Current interval before update: [1.584375, 1.695312]
+  Updated interval: [1.614844, 1.695312]
+
+Converged after 6 iterations
+Final interval: [1.614844, 1.695312], xm: 1.655078
+
+=== Chord (ε=0.05, max_iter=100) ===
+Start range: (0, 2)
+Initial df(left): -8.000000, df(right): 4.000000
+
+Iteration 0:
+  Left: 0.000000 (df=-8.000000)
+  Right: 2.000000 (df=4.000000)
+  New point: 1.333333 (df=-2.962963)
+
+Iteration 1:
+  Left: 1.333333 (df=-2.962963)
+  Right: 2.000000 (df=4.000000)
+  New point: 1.617021 (df=-0.537838)
+
+Iteration 2:
+  Left: 1.617021 (df=-0.537838)
+  Right: 2.000000 (df=4.000000)
+  New point: 1.662413 (df=-0.080900)
+
+Iteration 3:
+  Left: 1.662413 (df=-0.080900)
+  Right: 2.000000 (df=4.000000)
+  New point: 1.669105 (df=-0.011806)
+
+Converged after 4 iterations
+
+=== Golden Section (ε=0.05, max_iter=100) ===
+Start range: (0, 2)
+
+Iteration 0:
+  Left: 0.000000, Right: 2.000000
+  x1: 0.764000 (f=6.556871), x2: 1.236000 (f=4.223160)
+
+Iteration 1:
+  Left: 0.764000, Right: 2.000000
+  x1: 1.236000 (f=4.223160), x2: 1.527848 (f=3.473797)
+
+Iteration 2:
+  Left: 1.236000, Right: 2.000000
+  x1: 1.527848 (f=3.473797), x2: 1.708152 (f=3.380932)
+
+Iteration 3:
+  Left: 1.527848, Right: 2.000000
+  x1: 1.708152 (f=3.380932), x2: 1.819638 (f=3.494795)
+
+Iteration 4:
+  Left: 1.527848, Right: 1.819638
+  x1: 1.639312 (f=3.378302), x2: 1.708152 (f=3.380932)
+
+Iteration 5:
+  Left: 1.527848, Right: 1.708152
+  x1: 1.596724 (f=3.400758), x2: 1.639312 (f=3.378302)
+
+Iteration 6:
+  Left: 1.596724, Right: 1.708152
+  x1: 1.639312 (f=3.378302), x2: 1.665587 (f=3.373503)
+
+Iteration 7:
+  Left: 1.639312, Right: 1.708152
+  x1: 1.665587 (f=3.373503), x2: 1.681855 (f=3.374092)
+
+Converged after 8 iterations
+min =  1.660583391086432
+
+=== Newton (ε=0.05, max_iter=100) ===
+Start range: (0, 2)
+
+Iteration 0:
+  x: 1.000000
+  f'(x): -5.000000, f''(x): 5.000000
+  New x: 2.000000
+
+Iteration 1:
+  x: 2.000000
+  f'(x): 4.000000, f''(x): 14.000000
+  New x: 1.714286
+
+Iteration 2:
+  x: 1.714286
+  f'(x): 0.466472, f''(x): 10.816327
+  New x: 1.671159
+
+Converged after 3 iterations
+
+=== square approximation, x_0=1.0, h=0.5 ===
+  f(x_0) =  5.25
+  f(x_0 + h) =  3.515625
+
+Iteration 0:
+  x_1 =  1.0  (f(x_1) =  5.25 )
+  x_2 =  1.5  (f(x_2) =  3.515625 )
+  x_3 =  2.0  (f(x_3) =  4.0 )
+  F_min =  3.515625
+  f(x_parabola) =  3.377829462192013
+  sorted_x_mins =  [1.6408450704225352, 1.5, 2.0, 1.0]
+  abs((F_min - f_min) / f_min) =  0.04079410738473633
+  abs((x_2 - minimum_x_0) / minimum_x_0) =  0.0
+  x* =  1.6408450704225352
+
+Converged after 1 iterations

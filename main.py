@@ -50,7 +50,8 @@ if __name__ == "__main__":
         print(e)
     try:
 
-        optimizer.golden_section(epsilon=epsilon)
+        mn, it = optimizer.golden_section(epsilon=epsilon)
+        print("min = ", mn)
         plot_golden_section(optimizer)
 
     except ValueError as e:

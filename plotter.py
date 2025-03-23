@@ -17,7 +17,7 @@ def plot_golden_section(optimizer: FunctionToOptimize):
     plt.plot(x, y, label="Function")
     for i, d in enumerate(optimizer.golden_data):
         plt.axvspan(d["left"], d["right"], alpha=0.1, color="blue")
-        plt.scatter([d["c"], d["d"]], [d["fc"], d["fd"]], color="red", s=20)
+        plt.scatter([d["x1"], d["x2"]], [d["f_x1"], d["f_x2"]], color="red", s=20)
     final_x = (
         optimizer.golden_data[-1]["left"] + optimizer.golden_data[-1]["right"]
     ) / 2

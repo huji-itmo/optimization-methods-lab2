@@ -37,29 +37,35 @@ class FunctionToOptimize:
             print(f"Start range: {self.optimization_range}")
 
         left, right = self.optimization_range
-        phi = (1 + 5**0.5) / 2
 
-        c = right - (right - left) / phi
-        d = left + (right - left) / phi
-        fc, fd = self.func(c), self.func(d)
+        x1 = left + 0.382 * (right - left)
+        x2 = left + 0.618 * (right - left)
+        f_x1, f_x2 = self.func(x1), self.func(x2)
 
         for it in range(max_iter):
             if self.debug:
                 print(f"\nIteration {it}:")
                 print(f"  Left: {left:.6f}, Right: {right:.6f}")
-                print(f"  c: {c:.6f} (f={fc:.6f}), d: {d:.6f} (f={fd:.6f})")
+                print(f"  x1: {x1:.6f} (f={f_x1:.6f}), x2: {x2:.6f} (f={f_x2:.6f})")
                 self.golden_data.append(
-                    {"left": left, "right": right, "c": c, "fc": fc, "d": d, "fd": fd}
+                    {
+                        "left": left,
+                        "right": right,
+                        "x1": x1,
+                        "f_x1": f_x1,
+                        "x2": x2,
+                        "f_x2": f_x2,
+                    }
                 )
 
-            if fc < fd:
-                right, d, fd = d, c, fc
-                c = right - (right - left) / phi
-                fc = self.func(c)
+            if f_x1 < f_x2:
+                right, x2, f_x2 = x2, x1, f_x1
+                x1 = left + 0.382 * (right - left)
+                f_x1 = self.func(x1)
             else:
-                left, c, fc = c, d, fd
-                d = left + (right - left) / phi
-                fd = self.func(d)
+                left, x1, f_x1 = x1, x2, f_x2
+                x2 = left + 0.618 * (right - left)
+                f_x2 = self.func(x2)
 
             if abs(right - left) < epsilon:
                 if self.debug:
@@ -256,8 +262,8 @@ class FunctionToOptimize:
         f_0 = f(x_parabola)
         f_0_plus_h = f(x_parabola + h)
 
-        print("f(x_0) = ", f_0)
-        print("f(x_0 + h) = ", f_0_plus_h)
+        print("  f(x_0) = ", f_0)
+        print("  f(x_0 + h) = ", f_0_plus_h)
 
         x_1, x_2, x_3 = 0, 0, 0
         if f_0 < f_0_plus_h:
@@ -272,38 +278,38 @@ class FunctionToOptimize:
         for it in range(max_iter):
             print(f"\nIteration {it}:")
 
-            print("x_1 = ", x_1, " (f(x_1) = ", f(x_1), ")")
-            print("x_2 = ", x_2, " (f(x_2) = ", f(x_2), ")")
-            print("x_3 = ", x_3, " (f(x_3) = ", f(x_3), ")")
+            print("  x_1 = ", x_1, " (f(x_1) = ", f(x_1), ")")
+            print("  x_2 = ", x_2, " (f(x_2) = ", f(x_2), ")")
+            print("  x_3 = ", x_3, " (f(x_3) = ", f(x_3), ")")
 
             F_min = min(f(x_1), f(x_2), f(x_3))
-            print("F_min = ", F_min)
+            print("  F_min = ", F_min)
 
             x_parabola = 0.5 * (x_1 + x_2) + 0.5 * (x_3 - x_1) * (x_3 - x_2) * (
                 f(x_2) - f(x_1)
             ) / (f(x_1) * (x_2 - x_3) + f(x_2) * (x_3 - x_1) + f(x_3) * (x_1 - x_2))
 
-            print("f(x_parabola) = ", f(x_parabola))
+            print("  f(x_parabola) = ", f(x_parabola))
 
             func = {f(x_1): x_1, f(x_2): x_2, f(x_3): x_3, f(x_parabola): x_parabola}
             sorted_x_mins = [
                 func[x] for x in sorted([f(x_1), f(x_2), f(x_3), f(x_parabola)])
             ]
-            print("sorted_x_mins = ", sorted_x_mins)
+            print("  sorted_x_mins = ", sorted_x_mins)
 
             f_stop_criteria = abs((F_min - f(x_parabola)) / f(x_parabola))
             x_stop_criteria = abs((sorted_x_mins[0] - x_parabola) / x_parabola)
 
             print(
-                "abs((F_min - f_min) / f_min) = ",
+                "  abs((F_min - f_min) / f_min) = ",
                 f_stop_criteria,
             )
             print(
-                "abs((x_2 - minimum_x_0) / minimum_x_0) = ",
+                "  abs((x_2 - minimum_x_0) / minimum_x_0) = ",
                 x_stop_criteria,
             )
 
-            print("x* = ", x_parabola)
+            print("  x* = ", x_parabola)
 
             if self.debug:
                 self.square_approx_data.append(
@@ -325,9 +331,25 @@ class FunctionToOptimize:
                 return x_parabola, it + 1
             else:
                 if x_parabola >= x_1 and x_parabola <= x_3:
-                    x_1 = sorted_x_mins[0]
-                    x_2 = sorted_x_mins[1]
-                    x_3 = sorted_x_mins[2]
+                    best_x = sorted_x_mins[0]
+                    sorted_points = sorted([x_1, x_2, x_3])
+
+                    index = 0
+                    for i in range(len(sorted_points)):
+                        if best_x > sorted_points[i]:
+                            index = i
+
+                    if index >= 1:
+                        sorted_points = sorted([best_x, x_2, x_3])
+                    else:
+                        sorted_points = sorted([best_x, x_1, x_2])
+
+                    x_1, x_2, x_3 = (
+                        sorted_points[0],
+                        sorted_points[1],
+                        sorted_points[2],
+                    )
+
                 else:
                     x_1, x_2, x_3 = x_2, x_2 + h, 0
                     f_0 = f(x_1)
@@ -337,7 +359,7 @@ class FunctionToOptimize:
                     else:
                         x_3 = x_parabola - h
 
-                sorted_points = sorted([x_1, x_2, x_3])
-                x_1, x_2, x_3 = sorted_points[0], sorted_points[1], sorted_points[2]
+                    sorted_points = sorted([x_1, x_2, x_3])
+                    x_1, x_2, x_3 = sorted_points[0], sorted_points[1], sorted_points[2]
 
         return x_parabola, max_iter
